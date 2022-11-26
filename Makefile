@@ -21,4 +21,15 @@ run_server:
 bench:
 	ab -n 2000 -c 100 -g with-cache.data http://localhost:8080/recipes
 
+test:
+	go test -v -cover ./...
+
+test-circle:
+	go test -v -race -coverprofile=c.out -cover $(go list ./... | circleci tests split --split-by=timings)
+	go tool cover -html=c.out -o coverage.html
+
+test-local:
+	go test -v -race -coverprofile=c.out -cover ./...
+	go tool cover -html=c.out -o coverage.html
+
 .PHONY: test
