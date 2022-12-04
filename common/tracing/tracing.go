@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 	zipkinot "github.com/openzipkin-contrib/zipkin-go-opentracing"
 	"github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
@@ -57,4 +58,14 @@ func AddTracingToReqFromContext(ctx context.Context, req *http.Request) {
 	if err != nil {
 		panic("Unable to inject tracing context: " + err.Error())
 	}
+}
+
+// StartChildSpanFromContext starts a child span from span within the supplied context, if available.
+func StartChildSpanFromContext(ctx context.Context, opName string) opentracing.Span {
+	if ctx.Value("opentracing-span") == nil {
+		return tracer.StartSpan(opName, ext.RPCServerOption(nil))
+	}
+	parent := ctx.Value("opentracing-span").(opentracing.Span)
+	child := tracer.StartSpan(opName, opentracing.ChildOf(parent.Context()))
+	return child
 }

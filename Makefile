@@ -32,4 +32,12 @@ test-local:
 	go test -v -race -coverprofile=c.out -cover ./...
 	go tool cover -html=c.out -o coverage.html
 
+graph-init:
+	go get github.com/99designs/gqlgen
+	go run github.com/99designs/gqlgen init
+
+graph-modify:
+	go get github.com/99designs/gqlgen
+	go run github.com/99designs/gqlgen generate .
+
 .PHONY: test
